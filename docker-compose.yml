@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./todolists-frontend
+    container_name: frontend-app
+    ports:
+      - "3006:3006"
+    volumes:
+      - .:/src/app
+    depends_on:
+      - backend
+    command: npm run start
+
+  backend:
+    build:
+      context: ./todo-lists
+    container_name: backend-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
