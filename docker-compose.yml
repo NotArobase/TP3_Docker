@@ -1,29 +1,27 @@
-version: '3.8'
-
+version: '3.9'
 services:
-  frontend:
+  todo-client:
     build:
       context: ./todolists-frontend
-    container_name: frontend-app
+      dockerfile: Dockerfile
+    volumes:
+      - ~/.yalc:/src/app/node_modules/.yalc:ro
     ports:
       - "3006:3006"
-    volumes:
-      - .:/src/app
+    environment:
+      - PORT=3006
+    command: ["npm", "start"]
     depends_on:
-      - backend
-    command: npm run start
+      - todo-server
 
-  backend:
+  todo-server:
     build:
       context: ./todo-lists
-    container_name: backend-app
-    ports:
-      - "3000:3000"
+      dockerfile: Dockerfile
     volumes:
-      - .:/app
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      - ~/.yalc:/app/node_modules/.yalc:ro
+    environment:
+      - PORT=3000
+    ports:
+      - "3006:3006"
+    command: ["fastify", "start", "-l", "info", "dist/app.js"]
