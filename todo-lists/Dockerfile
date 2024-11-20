@@ -1,19 +1,26 @@
 FROM node:18
 
-# Create app directory in container
-WORKDIR /app
+# Create app directory
+WORKDIR /src/app
 
-COPY . .
+COPY ./package*.json ./
 
+# Install yalc globally
+RUN npm install -g yalc
+
+# Install dependencies
 RUN npm install
 
-RUN npm install -g fastify-cli
+# Copy the rest of the application files
+COPY . .
 
-RUN npm link --local
+# Link the shared package using yalc
+RUN yalc add todo-lists
 
-RUN npm run build:ts
+# Build the application
+RUN npm run build
 
+# Set default command
+CMD ["npm", "start"]
 
-CMD ["fastify", "start", "-l", "info", "dist/app.js"]
-
-EXPOSE 3000
+EXPOSE 3006
