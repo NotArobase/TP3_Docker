@@ -1,26 +1,28 @@
 FROM node:18
 
 # Create app directory
-WORKDIR /src/app
+WORKDIR /app
 
 COPY ./package*.json ./
+# Install dependencies
+RUN npm install
 
 # Install yalc globally
 RUN npm install -g yalc
 
-# Install dependencies
-RUN npm install
+# Publish the shared package first
+RUN yalc publish
 
 # Copy the rest of the application files
 COPY . .
 
-# Link the shared package using yalc
-RUN yalc add todo-lists
+# Install Fastify CLI globally
+RUN npm install -g fastify-cli
 
-# Build the application
-RUN npm run build
+# Build the TypeScript project
+RUN npm run build:ts
 
 # Set default command
-CMD ["npm", "start"]
+CMD ["fastify", "start", "-l", "info", "dist/app.js"]
 
-EXPOSE 3006
+EXPOSE 3000
